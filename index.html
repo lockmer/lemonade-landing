@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lemonade Berlin Landing Page</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            color:#ffaaaa;
+        }
+        #svg-container {
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div id="svg-container">
+        <object type="image/svg+xml" data="assets/lemonade_berlin.svg" id="svg-object" style="width: 100%; height: auto;">
+            Your browser does not support SVG.
+        </object>
+    </div>
+    <script>
+        const svgObject = document.getElementById('svg-object');
+        svgObject.addEventListener('load', function() {
+            const svgDoc = svgObject.contentDocument;
+            if (!svgDoc) {
+                console.error('SVG document not accessible');
+                return;
+            }
+            const bgLayer = svgDoc.getElementById('BG');
+            const lemonStamp = svgDoc.getElementById('lemon_stamp');
+            const comingSoon = svgDoc.getElementById('coming_soon');
+            
+            if (!bgLayer) {
+                console.error('BG element not found in SVG');
+                console.log('Available IDs:', Array.from(svgDoc.querySelectorAll('[id]')).map(el => el.id));
+                return;
+            }
+            if (!lemonStamp) {
+                console.warn('lemon_stamp element not found in SVG');
+            }
+            if (!comingSoon) {
+                console.warn('coming_soon element not found in SVG');
+            }
+            
+            console.log('Elements found:', { bgLayer, lemonStamp, comingSoon });
+
+            // Create style element for animations
+            const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+            style.textContent = `
+                @keyframes colorFade {
+                    0% { fill: #ff6b6b; }
+                    33% { fill: #4ecdc4; }
+                    66% { fill: #45b7d1; }
+                    100% { fill: #ff6b6b; }
+                }                
+                @keyframes colorFade2 {
+                    0% { fill: #4ecdc4; }
+                    11% { fill: #ff6b6b; }
+                    22% { fill: #45b7d1; }
+                    33% { fill: #ff6b6b; }
+                    44% { fill: #4ecdc4; }
+                    55% { fill: #ff6b6b; }
+                    66% { fill: #4ecdc4; }
+                    77% { fill: #45b7d1; }
+                    88% { fill: #45b7d1; }
+                    100% { fill: #ff6b6b; }
+                }
+                @keyframes rotate {
+                    from { transform: rotate(0deg); }
+                    to { transform: rotate(360deg); }
+                }
+                #BG {
+                    animation: colorFade 6s infinite;
+                }
+                #lemon_stamp {
+                    transform-origin: center;
+                    animation: rotate 10s linear infinite;
+                }
+                #coming_soon {
+                    animation: colorFade2 1s infinite;
+                }
+            `;
+            // Append style to SVG root
+            const svgRoot = svgDoc.documentElement;
+            svgRoot.appendChild(style);
+
+            // JavaScript for random color blinking of coming_soon
+            if (comingSoon) {
+                const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#feca57', '#ff9f43'];
+                function blink() {
+                    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+                    const randomDuration = Math.random() * 0.5 + 0.2; // 0.2s to 0.7s
+                    comingSoon.setAttribute('fill', randomColor);
+                    setTimeout(blink, randomDuration * 1000);
+                }
+                blink();
+            }
+        });
+    </script>
+</body>
+</html>
